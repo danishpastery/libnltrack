@@ -1,0 +1,200 @@
+#summary Getting started with libnltrack
+#labels Phase-Implementation,Phase-Deploy
+
+= Introduction =
+
+Now its time to getting started with libnltrack. For the first, we need  [url=http://switch.dl.sourceforge.net/sourceforge/dev-cpp/devcpp-4.9.9.2_setup.exe]Dev-C++[/url] (a GNU C Compiler).
+
+Just install it!
+
+After the installation, download please the library source from [url=http://code.google.com/p/libnltrack/]Google Code[/url] and extract it anywhere on your Desktop.
+
+Open the extracted lib folder *libnltrack-1.0.0*.
+
+For the first, you will find two folders and many files. The folder *doc* contains the documentation of libnltrack and *libnltrack* the source files.
+
+Okay lets start to compile the library from source. Open the Dev-C++ project file *libnltrack.dev*.
+
+To compile the library, press CRTL+F9.
+
+You will get a file called *lnltrack.a*.
+
+[http://www.coastercrazy.com/forum/file_attachments/geforcefan/2008526152229_Unbenannt.jpg]
+
+[http://www.coastercrazy.com/forum/file_attachments/geforcefan/2008526152337_Unbenannt.jpg]
+
+Okay, have now compiled the library from source.
+
+We have to copy the files into the Dev-C++ folder, because Dev-C++ should use the library.
+
+Just copy the file *lnltrack.a* into *C:/Dev-Cpp/lib* and the contents of libnltrack into *C:/Dev-Cpp/include/libnltrack*
+
+[http://www.coastercrazy.com/forum/file_attachments/geforcefan/200852615284_Unbenannt.jpg]
+Now you can use the library.
+
+Please close all windows. We will create a simple Auto Supporter.
+Open Dev-C++ and create a new C-Console-Application Project.
+
+Create a folder on desktop called "Auto Supporter" and save the project into it.
+
+You will see a source code into the Dev-C++ window. Just remove its content and we will begin with the Auto Supporter.
+
+Please include our library 
+
+{{{
+#include <libnltrack/libnltrack.h>
+}}}
+
+we need a main routine:
+
+{{{
+int main(int argc, char *argv[])
+{
+}
+}}}
+
+We need a NlTrack variable. This will contain all track datas.
+
+{{{
+NlTrack test;
+}}}
+
+Now we´ll open a nltrack file with the function NlOpen()
+
+{{{
+NlOpen("newtrack.nltrack", &test);
+}}}
+
+Okay, til now we only opened the nltrack file. The next step is to read out all Segment Nodes and add a fundament under the segment nodes.
+
+Each Node, each segment, each bezier is numbered from 0 to the number of it self.
+
+They are called index numbers. For example we have 3 Supports. The first support have the index 0, the second one the index 1 and the last one the index 2.
+
+Its the same for everything else.
+
+All segment nodes have an index number too, but they begin to count each segment by 0.
+
+That means, if we have 2 segments and 3 nodes on each of them, thaén we have:
+
+{{{
+ .......SEGMENT 0................SEGMENT 1
+|-----------------------|-----------------------|
+.....O.....O.....O...........O.....O.......O
+.....0.....1.....2...........0.....1.......2
+}}}
+
+Lets read the number of Segments:
+
+{{{
+int totalSegments = getTotalSegments(&test);
+}}}
+
+Now we will loop each segment:
+{{{
+    int i, t;
+
+    for(i = 0; i < totalSegments; i++) 
+    {
+}}}
+
+And now we have too loop all track nodes on each segment.
+We will need the number of the track nodes.
+{{{
+          int totalSegmentNode = getTotalTrackNodes(i, &test);
+}}}
+
+and just loop them, too:
+{{{
+          for(t = 0; t < totalSegmentNode; t++) 
+          {
+}}}
+
+Okay, lets find out the position of each node
+{{{
+                Vertex nodePos = getPosSegmentNode(t, i, &test);
+}}}
+
+t stands for the index number of the current node, and i for the current segment.
+
+Now add a Fundament
+{{{
+                int funindex = addFundNode(0,0,0,0, 0x0 ,0, nodePos.x, 0, nodePos.z, &test);
+}}}
+
+Please look at the documentation, for what the arguments for addFundNode() standing.
+
+addFundNode() will return th index of the added fundament. Its important, to connect the track node and the added fundament to a support.
+
+Now connect the track node with the added fundament to a support:
+
+{{{
+                int supportindex = addSupport( NODE_SEGMENT, t, i, 
+                                               NODE_FUND, funindex, 0, 
+                                               0,0,0,&test);
+}}}
+
+NODE_SEGMENT shows the lib, that the first node is a segment node. t is the node index and i the segment index. Segment index is only needed, if the node type is a segment.
+
+The same for the second node. Its the fundament node (NODE_FUND). funindex is the returned index, by adding our fundament. You can read the documentation, for knowing, for what the rest is standing for.
+
+Okay, now close the loop, and save the file:
+
+          {{{
+}
+    }
+    
+    NlSave("newtrack2.nltrack", &test);
+}}}
+
+Now you have to link your Project woth the nltrack library (Project->Project Options->Parameter->Linker: -lnltrack)
+
+[http://www.coastercrazy.com/forum/file_attachments/geforcefan/2008526155815_Unbenannt.jpg]
+
+Just compile and run the project with F9.
+
+You need before you run the tool, a track, called newtrack.nltrack to test our tool. You will get an outputed file called newtrack2.nltrack. Look into it and have Fun.
+
+[http://www.coastercrazy.com/forum/file_attachments/geforcefan/200852616149_Unbenannt.jpg]
+
+Here is the Source code:
+
+{{{
+#include <libnltrack/libnltrack.h>
+
+int main(int argc, char **argv)
+{
+    NlTrack test;
+    
+    NlOpen("newtrack.nltrack", &test);
+    
+    int i, t;
+    
+    int totalSegments = getTotalSegments(&test);
+    int totalFreeNode = getTotalFreeNodes(&test);
+    int totalFundNode = getTotalFundNodes(&test);
+    
+    for(i = 0; i < totalSegments; i++) 
+    {
+          int totalSegmentNode = getTotalTrackNodes(i, &test);
+          
+          for(t = 0; t < totalSegmentNode; t++) 
+          {
+                Vertex nodePos = getPosSegmentNode(t, i, &test);
+                int funindex = addFundNode(0,0,0,0, 0x0 ,0, nodePos.x, 0, nodePos.z, &test);
+                
+                int supportindex = addSupport( NODE_SEGMENT, t, i, 
+                                               NODE_FUND, funindex, 0, 
+                                               0,0,0,&test);
+          }
+    }
+    
+    NlSave("newtrack2.nltrack", &test);
+
+}
+}}}
+
+
+Download the Project:
+
+http://code.google.com/p/libnltrack/downloads/detail?name=test.rar&can=2&q=#makechanges
