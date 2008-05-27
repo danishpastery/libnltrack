@@ -3,11 +3,11 @@
 
 = Introduction =
 
-Now its time to getting started with libnltrack. For the first, we need  [url=http://switch.dl.sourceforge.net/sourceforge/dev-cpp/devcpp-4.9.9.2_setup.exe]Dev-C++[/url] (a GNU C Compiler).
+Now its time to getting started with libnltrack. For the first, we need  [http://switch.dl.sourceforge.net/sourceforge/dev-cpp/devcpp-4.9.9.2_setup.exe Dev-C++] (a GNU C Compiler).
 
 Just install it!
 
-After the installation, download please the library source from [url=http://code.google.com/p/libnltrack/]Google Code[/url] and extract it anywhere on your Desktop.
+After the installation, download please the library source from [http://code.google.com/p/libnltrack/ Google Code] and extract it anywhere on your Desktop.
 
 Open the extracted lib folder *libnltrack-1.0.0*.
 
